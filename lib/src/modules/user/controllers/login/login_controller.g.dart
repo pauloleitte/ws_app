@@ -16,12 +16,6 @@ mixin _$LoginController on _LoginControllerBase, Store {
       (_$modelComputed ??= Computed<LoginViewModel>(() => super.model,
               name: '_LoginControllerBase.model'))
           .value;
-  Computed<bool>? _$isValidComputed;
-
-  @override
-  bool get isValid => (_$isValidComputed ??= Computed<bool>(() => super.isValid,
-          name: '_LoginControllerBase.isValid'))
-      .value;
 
   final _$emailAtom = Atom(name: '_LoginControllerBase.email');
 
@@ -68,30 +62,13 @@ mixin _$LoginController on _LoginControllerBase, Store {
     });
   }
 
-  final _$errorAtom = Atom(name: '_LoginControllerBase.error');
-
-  @override
-  bool get error {
-    _$errorAtom.reportRead();
-    return super.error;
-  }
-
-  @override
-  set error(bool value) {
-    _$errorAtom.reportWrite(value, super.error, () {
-      super.error = value;
-    });
-  }
-
   @override
   String toString() {
     return '''
 email: ${email},
 password: ${password},
 busy: ${busy},
-error: ${error},
-model: ${model},
-isValid: ${isValid}
+model: ${model}
     ''';
   }
 }

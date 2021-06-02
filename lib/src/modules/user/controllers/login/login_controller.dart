@@ -1,3 +1,4 @@
+import 'package:asuka/asuka.dart' as asuka;
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mobx/mobx.dart';
@@ -10,17 +11,14 @@ part 'login_controller.g.dart';
 class LoginController = _LoginControllerBase with _$LoginController;
 
 abstract class _LoginControllerBase with Store {
-
   @observable
   String? email;
+
   @observable
   String? password;
 
   @observable
   bool busy = false;
-
-  @observable
-  bool error = false;
 
   UserService service;
   UserStore store;
@@ -30,20 +28,21 @@ abstract class _LoginControllerBase with Store {
   @computed
   LoginViewModel get model => LoginViewModel(email: email, password: password);
 
-  @computed
-  bool get isValid => model.isValidEmail && model.isValidPassword;
-
   Future<void> login() async {
     try {
       busy = true;
-      await Future.delayed(Duration(seconds: 1));
-      var user = await service.login(model);
-      store.setUser(user);
-      Modular.to.navigate(AppRoutes.HOME);
+      var result = await service.login(model);
+      result.fold((failure) {
+        asuka.showSnackBar(SnackBar(content: Text('Usuário ou senha inválidos!')));
+      }, (user) {
+        store.setUser(user);
+        Modular.to.navigate(AppRoutes.HOME);
+      });
     } catch (e) {
       busy = false;
-      error = true;
-      debugPrint(e.toString());
+      asuka.showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      busy = false;
     }
   }
 }

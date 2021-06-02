@@ -91,6 +91,21 @@ mixin _$SignupController on _SignupControllerBase, Store {
     });
   }
 
+  final _$busyAtom = Atom(name: '_SignupControllerBase.busy');
+
+  @override
+  bool get busy {
+    _$busyAtom.reportRead();
+    return super.busy;
+  }
+
+  @override
+  set busy(bool value) {
+    _$busyAtom.reportWrite(value, super.busy, () {
+      super.busy = value;
+    });
+  }
+
   @override
   String toString() {
     return '''
@@ -98,6 +113,7 @@ name: ${name},
 email: ${email},
 password: ${password},
 confirmPassword: ${confirmPassword},
+busy: ${busy},
 isValid: ${isValid},
 isValidEmail: ${isValidEmail},
 model: ${model}

@@ -20,6 +20,10 @@ class AppModule extends Module {
     Bind((i) => UserStore(i.get())),
     Bind(
       (i) => BaseOptions(
+        followRedirects: false,
+        validateStatus: (status) {
+          return status! < 500;
+        },
         baseUrl: 'http://192.168.0.48:3000/api/v1',
         connectTimeout: 5000,
       ),
@@ -33,5 +37,4 @@ class AppModule extends Module {
     ChildRoute(AppRoutes.SPLASH, child: (_, __) => SplashPage()),
     ChildRoute(AppRoutes.HOME, child: (_, __) => HomePage()),
   ];
-
 }

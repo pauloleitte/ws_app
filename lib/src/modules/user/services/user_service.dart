@@ -1,13 +1,18 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:dartz/dartz.dart';
 import 'package:ws_app/src/modules/user/models/forgot_password_request_model.dart';
+import 'package:ws_app/src/modules/user/models/image_model.dart';
 import 'package:ws_app/src/modules/user/models/login_request_model.dart';
 import 'package:ws_app/src/modules/user/models/reset_password_request_model.dart';
 import 'package:ws_app/src/modules/user/models/signup_request_model.dart';
+import 'package:ws_app/src/modules/user/models/user_create_model.dart';
 import 'package:ws_app/src/modules/user/view-models/forgot_password_view_model.dart';
 import 'package:ws_app/src/modules/user/view-models/login_view_model.dart';
 import 'package:ws_app/src/modules/user/view-models/reset_password_view_model.dart';
 import 'package:ws_app/src/modules/user/view-models/signup_view_model.dart';
+import 'package:ws_app/src/shared/errors/errors.dart';
 import 'package:ws_app/src/shared/services/local_storage_service.dart';
 import '../models/user_model.dart';
 import '../repositories/interfaces/user_repository_interface.dart';
@@ -40,7 +45,7 @@ class UserService implements IUserService {
   }
 
   @override
-  Future<UserModel> login(LoginViewModel model) async {
+  Future<Either<Failure, UserModel>> login(LoginViewModel model) async {
     var data = LoginRequestModel(email: model.email, password: model.password);
     var result = await _userRepository.login(data);
 
@@ -48,22 +53,30 @@ class UserService implements IUserService {
   }
 
   @override
-  Future<bool> signup(SignupViewModel model) async {
+  Future<Either<Failure, UserCreateModel>> signup(SignupViewModel model) async {
     var data = SignupRequestModel(
         name: model.name, email: model.email, password: model.password);
     return await _userRepository.signup(data);
   }
 
   @override
-  Future<bool> forgotPassword(ForgotPasswordViewModel model) async {
+  Future<Either<Failure, bool>> forgotPassword(
+      ForgotPasswordViewModel model) async {
     var data = ForgotPasswordRequestModel(email: model.email);
     return await _userRepository.forgotPassoword(data);
   }
 
   @override
-  Future<bool> resetPassword(ResetPasswordViewModel model) async {
+  Future<Either<Failure, bool>> resetPassword(
+      ResetPasswordViewModel model) async {
     var data = ResetPasswordRequestModel(
         token: model.token, password: model.password, email: model.email);
     return await _userRepository.resetPassword(data);
+  }
+
+  @override
+  Future<Either<Failure, ImageModel>> uploadImage(
+      File file, String? userId) async {
+    return await _userRepository.uploadImage(file, userId);
   }
 }

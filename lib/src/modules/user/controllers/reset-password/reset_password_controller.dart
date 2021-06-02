@@ -1,3 +1,4 @@
+import 'package:asuka/asuka.dart' as asuka;
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mobx/mobx.dart';
@@ -38,11 +39,12 @@ abstract class _ResetPasswordControllerBase with Store {
 
   Future<void> resetPassword() async {
     try {
-      await Future.delayed(Duration(seconds: 1));
       var result = await service.resetPassword(model);
-      if (result) {
-        Modular.to.navigate(AppRoutes.AUTH_HOME);
-      }
+      result.fold((failure) {
+        asuka.showSnackBar(SnackBar(
+            content:
+                Text('Não foi possível enviar o e-mail tente novamente!')));
+      }, (value) => Modular.to.navigate(AppRoutes.AUTH_HOME));
     } catch (e) {
       debugPrint(e.toString());
     }

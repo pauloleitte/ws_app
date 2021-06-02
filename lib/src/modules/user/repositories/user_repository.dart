@@ -1,11 +1,14 @@
 import 'dart:io';
 
+import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/native_imp.dart';
 import 'package:ws_app/src/modules/user/models/forgot_password_request_model.dart';
+import 'package:ws_app/src/modules/user/models/image_model.dart';
 import 'package:ws_app/src/modules/user/models/login_request_model.dart';
 import 'package:ws_app/src/modules/user/models/reset_password_request_model.dart';
 import 'package:ws_app/src/modules/user/models/signup_request_model.dart';
+import 'package:ws_app/src/modules/user/models/user_create_model.dart';
 import 'package:ws_app/src/shared/errors/errors.dart';
 
 import '../models/user_model.dart';
@@ -20,60 +23,100 @@ class UserRepository implements IUserRepository {
   void dispose() {}
 
   @override
-  Future<UserModel> login(LoginRequestModel model) async {
+  Future<Either<Failure, UserModel>> login(LoginRequestModel model) async {
     try {
       var response = await _client.post('/login', data: model.toJson());
       if (response.statusCode == HttpStatus.ok) {
         var result = UserModel.fromJson(response.data);
-        return result;
+        return Right(result);
       }
-      return UserModel();
+      return Left(DioFailure(
+          message: 'Usuário ou senha inválidos',
+          statusCode: response.statusCode));
     } on DioError catch (err) {
-      throw DioFailure(
-          message: err.response!.data, statusCode: err.response!.statusCode);
+      return Left(DioFailure(
+          message: err.response!.data[0].message,
+          statusCode: err.response!.statusCode));
     }
   }
 
   @override
-  Future<bool> signup(SignupRequestModel model) async {
+  Future<Either<Failure, UserCreateModel>> signup(
+      SignupRequestModel model) async {
     try {
       var response = await _client.post('/signup', data: model.toJson());
       if (response.statusCode == HttpStatus.created) {
-        return true;
+        return Right(UserCreateModel.fromJson(response.data));
       }
-      return false;
+      return Left(DioFailure(
+          message: 'Ocorreu um erro por favor tente novamente',
+          statusCode: response.statusCode));
     } on DioError catch (err) {
-      throw DioFailure(
-          message: err.response!.data, statusCode: err.response!.statusCode);
+      return Left(DioFailure(
+          message: err.response!.data, statusCode: err.response!.statusCode));
     }
   }
 
   @override
-  Future<bool> forgotPassoword(ForgotPasswordRequestModel model) async {
+  Future<Either<Failure, bool>> forgotPassoword(
+      ForgotPasswordRequestModel model) async {
     try {
       var response =
           await _client.post('/forgot-password', data: model.toJson());
       if (response.statusCode == HttpStatus.noContent) {
-        return true;
+        return Right(true);
       }
-      return false;
+      return Left(DioFailure(
+          message: 'Ocorreu um erro por favor tente novamente',
+          statusCode: response.statusCode));
     } on DioError catch (err) {
-      throw DioFailure(
-          message: err.response!.data, statusCode: err.response!.statusCode);
+      return Left(DioFailure(
+          message: err.response!.data, statusCode: err.response!.statusCode));
     }
   }
 
   @override
-  Future<bool> resetPassword(ResetPasswordRequestModel model) async {
+  Future<Either<Failure, bool>> resetPassword(
+      ResetPasswordRequestModel model) async {
     try {
       var response = await _client.post('reset-password', data: model.toJson());
+      await _client.post('/forgot-password', data: model.toJson());
       if (response.statusCode == HttpStatus.noContent) {
-        return true;
+        return Right(true);
       }
-      return false;
+      return Left(DioFailure(
+          message: 'Ocorreu um erro por favor tente novamente',
+          statusCode: response.statusCode));
     } on DioError catch (err) {
-      throw DioFailure(
-          message: err.response!.data, statusCode: err.response!.statusCode);
+      return Left(DioFailure(
+          message: err.response!.data, statusCode: err.response!.statusCode));
+    }
+  }
+
+  @override
+  Future<Either<Failure, ImageModel>> uploadImage(
+      File file, String? userId) async {
+    try {
+      String fileName = file.path.split('/').last;
+      FormData data = FormData.fromMap({
+        "file": await MultipartFile.fromFile(
+          file.path,
+          filename: fileName,
+        ),
+      });
+      final Map<String, dynamic> headers = new Map<String, dynamic>();
+      headers['userId'] = userId;
+      var response = await _client.post('/images',
+          data: data, options: Options(headers: headers));
+      if (response.statusCode == HttpStatus.ok) {
+        return Right(ImageModel.fromJson(response.data));
+      }
+      return Left(DioFailure(
+          message: 'Ocorreu um erro por favor tente novamente',
+          statusCode: response.statusCode));
+    } on DioError catch (err) {
+      return Left(DioFailure(
+          message: err.response!.data, statusCode: err.response!.statusCode));
     }
   }
 }

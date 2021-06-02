@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:ws_app/src/core/app_constants.dart';
 import 'package:ws_app/src/core/app_images.dart';
-import 'package:ws_app/src/core/app_routes.dart';
 import 'package:ws_app/src/modules/user/controllers/reset-password/reset_password_controller.dart';
 
 class BodyResetPassword extends StatefulWidget {

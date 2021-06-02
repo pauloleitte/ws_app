@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:ws_app/src/core/app_constants.dart';
 import 'package:ws_app/src/modules/user/controllers/signup/signup_controller.dart';
 
@@ -19,6 +23,27 @@ class _BodySignupState extends ModularState<BodySignup, SignupController> {
   final _confirmPasswordFocusNode = FocusNode();
 
   final _passwordController = TextEditingController();
+
+  File? _image;
+  final picker = ImagePicker();
+
+  Future getImage() async {
+    final pickedFile = await picker.getImage(
+        source: ImageSource.gallery,
+        maxHeight: 480,
+        maxWidth: 640,
+        imageQuality: 50
+        );
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+        controller.file = _image;
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
 
   @override
   void didChangeDependencies() {
@@ -59,8 +84,14 @@ class _BodySignupState extends ModularState<BodySignup, SignupController> {
                     ? FontWeight.bold
                     : FontWeight.normal)),
         keyboardType: TextInputType.emailAddress,
+        onChanged: (value) {
+          controller.email = value;
+        },
         validator: (value) {
-          if (controller.isValidEmail) {
+          if (value!.isEmpty) {
+            return 'campo obrigatório';
+          }
+          if (!controller.isValidEmail) {
             return 'Informe um e-mail válido';
           }
           return null;
@@ -107,7 +138,7 @@ class _BodySignupState extends ModularState<BodySignup, SignupController> {
         focusNode: _confirmPasswordFocusNode,
         style: TextStyle(color: Colors.white),
         decoration: InputDecoration(
-            labelText: 'senha',
+            labelText: 'confirme a senha',
             border: OutlineInputBorder(),
             labelStyle: TextStyle(
                 color: kSecondaryColor,
@@ -160,46 +191,80 @@ class _BodySignupState extends ModularState<BodySignup, SignupController> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: MediaQuery.of(context).size.height,
-      color: kPrimaryColor,
-      child: Padding(
-        padding: EdgeInsets.all(10),
-        child: Form(
-          key: _form,
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                buildName(),
-                SizedBox(
-                  height: 20,
-                ),
-                buildEmail(),
-                SizedBox(
-                  height: 20,
-                ),
-                buildPassword(),
-                SizedBox(
-                  height: 20,
-                ),
-                buildConfirmPassword(),
-                SizedBox(
-                  height: 20,
-                ),
-                SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: controller.isValid ? null : signup,
-                      child: Text(
-                        'Confirmar',
-                        style: kTextStyleButtonAuth,
+    return Observer(builder: (context) {
+      return Container(
+        width: double.infinity,
+        height: MediaQuery.of(context).size.height,
+        color: kPrimaryColor,
+        child: Padding(
+          padding: EdgeInsets.all(10),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _form,
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 10, right: 10),
+                      child: Container(
+                        width: double.infinity,
+                        height: 250,
+                        child: Column(children: [
+                          Center(
+                              child: _image == null
+                                  ? Text('No image selected.')
+                                  : ClipRRect(
+                                      borderRadius: BorderRadius.circular(90),
+                                      child: Image.file(
+                                        _image!,
+                                        height: 160.0,
+                                        width: 200,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )),
+                          SizedBox(height: 10),
+                          FloatingActionButton(
+                            onPressed: getImage,
+                            tooltip: 'Pick Image',
+                            child: Icon(
+                              Icons.add_a_photo,
+                              color: kPrimaryColor,
+                            ),
+                          )
+                        ]),
                       ),
-                    )),
-              ]),
+                    ),
+                    buildName(),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    buildEmail(),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    buildPassword(),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    buildConfirmPassword(),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: controller.busy ? null : signup,
+                          child: Text(
+                            'Confirmar',
+                            style: kTextStyleButtonAuth,
+                          ),
+                        )),
+                  ]),
+            ),
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

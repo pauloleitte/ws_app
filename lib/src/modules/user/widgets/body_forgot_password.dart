@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:ws_app/src/core/app_constants.dart';
 import 'package:ws_app/src/modules/user/controllers/forgot-password/forgot_password_controller.dart';
@@ -59,61 +60,64 @@ class _BodyForgotPasswordState
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: MediaQuery.of(context).size.height,
-      color: kPrimaryColor,
-      child: controller.busy
-          ? Center(
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(
-                      backgroundColor: Colors.white,
-                      valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
-                    ),
-                    Text('Carregando')
-                  ]),
-            )
-          : Padding(
-              padding: EdgeInsets.all(10),
-              child: SingleChildScrollView(
-                child: Form(
-                  key: _form,
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Esqueci minha senha',
-                          textAlign: TextAlign.start,
-                          style: kTextStyleTitle,
-                        ),
-                        Text(
-                          'Insira o e-mail associado à sua conta.',
-                          style: kTextStyleSubTitle,
-                        ),
-                        SizedBox(
-                          height: 100,
-                        ),
-                        buildEmail(),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed:
-                                  controller.isValid ? null : forgotPassword,
-                              child: Text(
-                                'Confirmar',
-                                style: kTextStyleButtonAuth,
-                              ),
-                            ))
-                      ]),
-                ),
-              )),
-    );
+    return Observer(builder: (context) {
+      return Container(
+        width: double.infinity,
+        height: MediaQuery.of(context).size.height,
+        color: kPrimaryColor,
+        child: controller.busy
+            ? Center(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        backgroundColor: Colors.white,
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(kPrimaryColor),
+                      ),
+                      Text('Carregando')
+                    ]),
+              )
+            : Padding(
+                padding: EdgeInsets.all(10),
+                child: SingleChildScrollView(
+                  child: Form(
+                    key: _form,
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Esqueci minha senha',
+                            textAlign: TextAlign.start,
+                            style: kTextStyleTitle,
+                          ),
+                          Text(
+                            'Insira o e-mail associado à sua conta.',
+                            style: kTextStyleSubTitle,
+                          ),
+                          SizedBox(
+                            height: 100,
+                          ),
+                          buildEmail(),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed:
+                                    controller.busy ? null : forgotPassword,
+                                child: Text(
+                                  'Confirmar',
+                                  style: kTextStyleButtonAuth,
+                                ),
+                              ))
+                        ]),
+                  ),
+                )),
+      );
+    });
   }
 }

@@ -10,6 +10,7 @@ ThemeData theme() {
     fontFamily: 'Muli',
     appBarTheme: appBarTheme(),
     textTheme: textTheme(),
+    snackBarTheme: snackBarThemeData(),
     inputDecorationTheme: inputDecorationTheme(),
     visualDensity: VisualDensity.adaptivePlatformDensity,
     textSelectionTheme: textSelectionThemeData(),
@@ -51,6 +52,10 @@ TextTheme textTheme() {
     bodyText1: TextStyle(color: kTextColor),
     bodyText2: TextStyle(color: kTextColor),
   );
+}
+
+SnackBarThemeData snackBarThemeData(){
+  return SnackBarThemeData(backgroundColor: kPrimaryColor);
 }
 
 AppBarTheme appBarTheme() {

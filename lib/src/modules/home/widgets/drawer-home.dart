@@ -25,7 +25,7 @@ class DrawerHome extends StatelessWidget {
                 currentAccountPicture: ClipRRect(
                   borderRadius: BorderRadius.circular(40),
                   child: Image.network(
-                    'http://localhost:3000/api/v1/files/565af4a3f2c696a1d3f001b636c72bd5-pinterest_board_photo.png',
+                   store.user.avatar!,
                     height: 150.0,
                     width: 100.0,
                     fit: BoxFit.cover,

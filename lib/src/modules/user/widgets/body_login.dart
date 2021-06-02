@@ -102,93 +102,76 @@ class _BodyLoginState extends ModularState<BodyLogin, LoginController> {
         width: double.infinity,
         height: MediaQuery.of(context).size.height,
         color: kPrimaryColor,
-        child: controller.busy
-            ? Container(
-                child: Center(
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(
-                          backgroundColor: Colors.white,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(kPrimaryColor),
-                        ),
-                        Text('Carregando')
-                      ]),
-                ),
-              )
-            : Padding(
-                padding: EdgeInsets.all(10),
-                child: SingleChildScrollView(
-                  child: Form(
-                    key: _form,
-                    child: Column(
+        child: Padding(
+          padding: EdgeInsets.all(10),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _form,
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: Image.asset(
+                        AppImages.logo,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    buildEmail(),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    buildPassword(),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Container(
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Center(
-                            child: Image.asset(
-                              AppImages.logo,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          buildEmail(),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          buildPassword(),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Container(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 10),
-                                  child: InkWell(
-                                    child: Text(
-                                      'Não tenho uma conta',
-                                      style: kTextStyleLink,
-                                    ),
-                                    onTap: () => {
-                                      Modular.to.navigate(AppRoutes.AUTH_SIGNUP)
-                                    },
-                                  ),
-                                ),
-                                InkWell(
-                                  child: Text(
-                                    'Esqueci minha senha',
-                                    style: kTextStyleLink,
-                                  ),
-                                  onTap: () => {
-                                    Modular.to.navigate(
-                                        AppRoutes.AUTH_FORGOT_PASSWORD)
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: controller.isValid ? null : login,
+                          Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: InkWell(
                               child: Text(
-                                'Entrar',
-                                style: kTextStyleButtonAuth,
+                                'Não tenho uma conta',
+                                style: kTextStyleLink,
                               ),
+                              onTap: () =>
+                                  {Modular.to.navigate(AppRoutes.AUTH_SIGNUP)},
                             ),
-                          )
-                        ]),
-                  ),
-                ),
-              ),
+                          ),
+                          InkWell(
+                            child: Text(
+                              'Esqueci minha senha',
+                              style: kTextStyleLink,
+                            ),
+                            onTap: () => {
+                              Modular.to
+                                  .navigate(AppRoutes.AUTH_FORGOT_PASSWORD)
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: controller.busy ? null : login,
+                        child: Text(
+                          'Entrar',
+                          style: kTextStyleButtonAuth,
+                        ),
+                      ),
+                    )
+                  ]),
+            ),
+          ),
+        ),
       );
     });
   }
